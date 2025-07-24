@@ -21,7 +21,33 @@
         "command": "code-jsonx.compactJson",
         "title": "Compact JSON"
       }
-    ]
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "code-jsonx.formatJson",
+          "when": "resourceLangId == json || resourceLangId == jsonc",
+          "group": "jsonx@1"
+        },
+        {
+          "command": "code-jsonx.compactJson",
+          "when": "resourceLangId == json || resourceLangId == jsonc",
+          "group": "jsonx@2"
+        }
+      ],
+      "editor/title": [
+        {
+          "command": "code-jsonx.formatJson",
+          "when": "resourceLangId == json || resourceLangId == jsonc",
+          "group": "jsonx@1"
+        },
+        {
+          "command": "code-jsonx.compactJson",
+          "when": "resourceLangId == json || resourceLangId == jsonc",
+          "group": "jsonx@2"
+        }
+      ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "pnpm run compile",
