@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as vscode from 'vscode';
-import { parseJsonWithPosition } from '../extension';
+import { parseJsonWithPosition } from '../utils/jsonParser';
 
 suite('Extension Test Suite', () => {
 	vscode.window.showInformationMessage('Start all tests.');
