@@ -3,7 +3,7 @@
 import * as vscode from 'vscode';
 
 // Custom JSON parser that tries to find the position of error
-function parseJsonWithPosition(text: string): { success: true; result: any } | { success: false; message: string; position: number } {
+export function parseJsonWithPosition(text: string): { success: true; result: any } | { success: false; message: string; position: number } {
 	try {
 		const result = JSON.parse(text);
 		return { success: true, result };
@@ -17,42 +17,86 @@ function parseJsonWithPosition(text: string): { success: true; result: any } | {
 			}
 			
 			// For newer Node.js versions that don't include position in error message,
-			// we'll try to find the problematic character manually
-			// This is a simplified approach - in a real implementation you might want
-			// more sophisticated parsing
-			const commonErrorPatterns = [
-				/Unexpected token (.*) in JSON/,
-				/Unexpected end of JSON/,
-				/Expected ':' after property name/,
-				/Expected property name or '\}'/
-			];
+			// we'll try to find the problematic character with a more accurate approach
+			let position = 0;
 			
-			for (const pattern of commonErrorPatterns) {
-				if (pattern.test(error.message)) {
-					// Try to find the approximate position by scanning for common problematic characters
-					const problematicChars = [',', '}', '{', '[', ']', ':', '"'];
-					for (let i = 0; i < text.length; i++) {
-						if (problematicChars.includes(text[i])) {
-							// Simple heuristic - not perfect but better than position 0
-							return { success: false, message: error.message, position: i };
-						}
-					}
+			// Try to find the actual position by parsing character by character
+			// This is a more accurate approach than the previous heuristic
+			for (let i = 0; i < text.length; i++) {
+				try {
+					// Try parsing progressively larger substrings
+					JSON.parse(text.substring(0, i + 1));
+				} catch (e) {
+					// If parsing fails, the error is likely at or near position i
+					position = i;
 					break;
 				}
 			}
 			
-			// Default to position 0 if we can't determine a better position
-			return { success: false, message: error.message, position: 0 };
+			// More precise error detection for common JSON syntax errors
+			// Look for specific patterns like double commas (with optional whitespace in between)
+			const commaPattern = /,\s*,/;
+			const commaMatch = text.match(commaPattern);
+			if (commaMatch && commaMatch.index !== undefined) {
+				// Find which comma is the problematic one
+				const firstCommaPos = commaMatch.index;
+				// Find the position of the second comma
+				const secondCommaPos = text.indexOf(',', firstCommaPos + 1);
+				
+				// Check if removing one comma would make it valid
+				const test1 = text.substring(0, secondCommaPos) + text.substring(secondCommaPos + 1);
+				const test2 = text.substring(0, firstCommaPos) + text.substring(firstCommaPos + 1);
+				
+				try {
+					JSON.parse(test1);
+					// If test1 works, the error is the second comma
+					position = secondCommaPos;
+				} catch (e1) {
+					try {
+						JSON.parse(test2);
+						// If test2 works, the error is the first comma
+						position = firstCommaPos;
+					} catch (e2) {
+						// Neither worked, point to the second comma as it's usually the problem
+						position = secondCommaPos;
+					}
+				}
+			}
+			
+			// If we still haven't found a position, try to find the first non-whitespace character
+			// after the last successfully parsed character
+			if (position === 0) {
+				for (let i = 0; i < text.length; i++) {
+					const char = text[i];
+					if (!/\s/.test(char)) { // Not whitespace
+						position = i;
+						break;
+					}
+				}
+			}
+			
+			return { success: false, message: error.message, position };
 		}
 		return { success: false, message: 'Unknown error occurred', position: 0 };
 	}
 }
 
 // Helper function to format JSON text
-function formatJsonText(text: string): { success: true; result: string } | { success: false; message: string; position: number } {
+function formatJsonText(text: string, selectionText: string, selectionStartOffset: number): { success: true; result: string } | { success: false; message: string; position: number } {
 	const parseResult = parseJsonWithPosition(text);
 	if (!parseResult.success) {
-		return parseResult;
+		// Adjust position if we're working with a selection
+		let adjustedPosition = parseResult.position;
+		if (selectionText !== text) {
+			// Check if error is within the selection
+			if (parseResult.position >= selectionStartOffset && parseResult.position < selectionStartOffset + selectionText.length) {
+				adjustedPosition = parseResult.position - selectionStartOffset;
+			} else {
+				// Error is outside selection, point to beginning of selection
+				adjustedPosition = 0;
+			}
+		}
+		return { success: false, message: parseResult.message, position: adjustedPosition };
 	}
 	
 	try {
@@ -68,10 +112,21 @@ function formatJsonText(text: string): { success: true; result: string } | { suc
 }
 
 // Helper function to compact JSON text
-function compactJsonText(text: string): { success: true; result: string } | { success: false; message: string; position: number } {
+function compactJsonText(text: string, selectionText: string, selectionStartOffset: number): { success: true; result: string } | { success: false; message: string; position: number } {
 	const parseResult = parseJsonWithPosition(text);
 	if (!parseResult.success) {
-		return parseResult;
+		// Adjust position if we're working with a selection
+		let adjustedPosition = parseResult.position;
+		if (selectionText !== text) {
+			// Check if error is within the selection
+			if (parseResult.position >= selectionStartOffset && parseResult.position < selectionStartOffset + selectionText.length) {
+				adjustedPosition = parseResult.position - selectionStartOffset;
+			} else {
+				// Error is outside selection, point to beginning of selection
+				adjustedPosition = 0;
+			}
+		}
+		return { success: false, message: parseResult.message, position: adjustedPosition };
 	}
 	
 	try {
@@ -116,8 +171,12 @@ export function activate(context: vscode.ExtensionContext) {
 			document.positionAt(document.getText().length)
 		);
 
+		// Get the full document text and selection start offset
+		const fullText = document.getText();
+		const selectionStartOffset = !selection.isEmpty ? document.offsetAt(selection.start) : 0;
+
 		// Format the text (selected or entire document)
-		const formatResult = formatJsonText(selectedText);
+		const formatResult = formatJsonText(fullText, selectedText, selectionStartOffset);
 		
 		if (formatResult.success) {
 			await editor.edit(editBuilder => {
@@ -134,9 +193,15 @@ export function activate(context: vscode.ExtensionContext) {
 			vscode.window.showErrorMessage(`Failed to format JSON: ${formatResult.message}`);
 			
 			// Calculate the position in the document
-			const errorPosition = !selection.isEmpty 
-				? document.positionAt(selection.start.character + formatResult.position)
-				: document.positionAt(formatResult.position);
+			let errorPosition;
+			if (!selection.isEmpty) {
+				// For selections, we need to calculate the actual document position
+				const actualErrorOffset = selectionStartOffset + formatResult.position;
+				errorPosition = document.positionAt(actualErrorOffset);
+			} else {
+				// For whole document, use the position directly
+				errorPosition = document.positionAt(formatResult.position);
+			}
 			
 			// Move cursor to the error position
 			editor.selection = new vscode.Selection(errorPosition, errorPosition);
@@ -166,8 +231,12 @@ export function activate(context: vscode.ExtensionContext) {
 			document.positionAt(document.getText().length)
 		);
 
+		// Get the full document text and selection start offset
+		const fullText = document.getText();
+		const selectionStartOffset = !selection.isEmpty ? document.offsetAt(selection.start) : 0;
+
 		// Compact the text (selected or entire document)
-		const compactResult = compactJsonText(selectedText);
+		const compactResult = compactJsonText(fullText, selectedText, selectionStartOffset);
 		
 		if (compactResult.success) {
 			await editor.edit(editBuilder => {
@@ -184,9 +253,15 @@ export function activate(context: vscode.ExtensionContext) {
 			vscode.window.showErrorMessage(`Failed to compact JSON: ${compactResult.message}`);
 			
 			// Calculate the position in the document
-			const errorPosition = !selection.isEmpty 
-				? document.positionAt(selection.start.character + compactResult.position)
-				: document.positionAt(compactResult.position);
+			let errorPosition;
+			if (!selection.isEmpty) {
+				// For selections, we need to calculate the actual document position
+				const actualErrorOffset = selectionStartOffset + compactResult.position;
+				errorPosition = document.positionAt(actualErrorOffset);
+			} else {
+				// For whole document, use the position directly
+				errorPosition = document.positionAt(compactResult.position);
+			}
 			
 			// Move cursor to the error position
 			editor.selection = new vscode.Selection(errorPosition, errorPosition);

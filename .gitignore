@@ -3,3 +3,4 @@
 /docs/index.md
 /out
 .env
+.DS_Store
