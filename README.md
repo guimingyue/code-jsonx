@@ -1,6 +1,5 @@
-# code-jsonx README
 
-This is the README for your extension "code-jsonx". After writing up a brief description, we recommend including the following sections.
+This is a VS Code extension that provides JSON formatting and compression capabilities for developers working with JSON files. This project is developed purely using Qwen Code and Lingma Code Assistant. The development process is in the series of articles published on [My Blog](https://guimy.tech).
 
 ## Features
 

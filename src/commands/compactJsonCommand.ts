@@ -28,7 +28,7 @@ export function registerCompactJsonCommand(context: vscode.ExtensionContext) {
         const selectionStartOffset = !selection.isEmpty ? document.offsetAt(selection.start) : 0;
 
         // Compact the text (selected or entire document)
-        const compactResult = compactJsonText(fullText, selectedText, selectionStartOffset);
+        const compactResult = compactJsonText(selectedText, selectedText, selectionStartOffset);
         
         if (compactResult.success) {
             await editor.edit(editBuilder => {

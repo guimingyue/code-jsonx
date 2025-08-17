@@ -28,7 +28,7 @@ export function registerFormatJsonCommand(context: vscode.ExtensionContext) {
         const selectionStartOffset = !selection.isEmpty ? document.offsetAt(selection.start) : 0;
 
         // Format the text (selected or entire document)
-        const formatResult = formatJsonText(fullText, selectedText, selectionStartOffset);
+        const formatResult = formatJsonText(selectedText, selectedText, selectionStartOffset);
         
         if (formatResult.success) {
             await editor.edit(editBuilder => {
