@@ -17,18 +17,38 @@ export function registerUnescapeJsonCommand(context: vscode.ExtensionContext) {
         );
 
         try {
-            // Unescape the JSON text
-            // Remove surrounding quotes if present
             let textToUnescape = selectedText;
+            
+            // If the text is a JSON string (quoted), we need to parse it properly
             if (textToUnescape.startsWith('"') && textToUnescape.endsWith('"')) {
-                textToUnescape = textToUnescape.substring(1, textToUnescape.length - 1);
+                // Use JSON.parse to properly handle all escape sequences including control characters
+                const unescapedText = JSON.parse(textToUnescape);
+                await editor.edit(editBuilder => {
+                    editBuilder.replace(rangeToReplace, unescapedText);
+                });
+            } else {
+                // If it's not quoted, we assume it's already unescaped or we try to unescape specific sequences
+                // Handle common escape sequences manually
+                let unescapedText = textToUnescape
+                    .replace(/\\n/g, '\n')        // New line
+                    .replace(/\\r/g, '\r')        // Carriage return
+                    .replace(/\\t/g, '\t')        // Tab
+                    .replace(/\\b/g, '\b')        // Backspace
+                    .replace(/\\f/g, '\f')        // Form feed
+                    .replace(/\\"/g, '"')         // Double quote
+                    .replace(/\\\\/g, '\\')       // Backslash
+                    .replace(/\\u([0-9a-fA-F]{4})/g, (match, hex) => {  // Unicode sequences
+                        try {
+                            return String.fromCharCode(parseInt(hex, 16));
+                        } catch (e) {
+                            return match; // Return original if parsing fails
+                        }
+                    });
+                
+                await editor.edit(editBuilder => {
+                    editBuilder.replace(rangeToReplace, unescapedText);
+                });
             }
-            
-            const unescapedText = JSON.parse(`"${textToUnescape}"`);
-            
-            await editor.edit(editBuilder => {
-                editBuilder.replace(rangeToReplace, unescapedText);
-            });
             
             if (!selection.isEmpty) {
                 vscode.window.showInformationMessage('Selected text unescaped successfully!');
