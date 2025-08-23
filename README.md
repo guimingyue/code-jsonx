@@ -32,15 +32,17 @@ Example:
 ```
 Becomes:
 ```json
-{"a": "x", "b": 1, "c": true}
+{\"a\":\"x\",\"b\":1,\"c\":true}
 ```
+
+Note: When escaping, the entire selected text is treated as a string value and properly escaped for use within JSON.
 
 ### Unescape JSON Text
 Converts escaped JSON text back to its original form.
 
 Example:
 ```json
-{"a": "x\nnewline", "b": 1, "c": true}
+{\"a\": \"x\\nnewline\", \"b\": 1, \"c\": true}
 ```
 Becomes:
 ```json
@@ -61,6 +63,11 @@ This extension does not contribute any VS Code settings.
 None at this time.
 
 ## Release Notes
+
+### 0.0.2
+
+- Fixed packaging issue where command files were not included in the extension package
+- Improved documentation and examples
 
 ### 0.0.1
 
