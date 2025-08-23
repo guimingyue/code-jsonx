@@ -5,3 +5,4 @@
 .env
 .DS_Store
 *.vsix
+!code-jsonx-0.0.2.vsix
