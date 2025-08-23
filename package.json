@@ -33,49 +33,46 @@
     "menus": {
       "editor/context": [
         {
+          "submenu": "code-jsonx.commands",
+          "when": "resourceLangId == json || resourceLangId == jsonc",
+          "group": "navigation"
+        }
+      ],
+      "code-jsonx.commands": [
+        {
           "command": "code-jsonx.formatJson",
           "when": "resourceLangId == json || resourceLangId == jsonc",
-          "group": "jsonx@1"
+          "group": "code-jsonx@1"
         },
         {
           "command": "code-jsonx.compactJson",
           "when": "resourceLangId == json || resourceLangId == jsonc",
-          "group": "jsonx@2"
+          "group": "code-jsonx@2"
         },
         {
           "command": "code-jsonx.escapeJson",
           "when": "resourceLangId == json || resourceLangId == jsonc",
-          "group": "jsonx@3"
+          "group": "code-jsonx@3"
         },
         {
           "command": "code-jsonx.unescapeJson",
           "when": "resourceLangId == json || resourceLangId == jsonc",
-          "group": "jsonx@4"
+          "group": "code-jsonx@4"
         }
       ],
       "editor/title": [
         {
-          "command": "code-jsonx.formatJson",
-          "when": "resourceLangId == json || resourceLangId == jsonc",
-          "group": "jsonx@1"
-        },
-        {
-          "command": "code-jsonx.compactJson",
-          "when": "resourceLangId == json || resourceLangId == jsonc",
-          "group": "jsonx@2"
-        },
-        {
-          "command": "code-jsonx.escapeJson",
-          "when": "resourceLangId == json || resourceLangId == jsonc",
-          "group": "jsonx@3"
-        },
-        {
-          "command": "code-jsonx.unescapeJson",
-          "when": "resourceLangId == json || resourceLangId == jsonc",
-          "group": "jsonx@4"
+          "submenu": "code-jsonx.commands",
+          "when": "resourceLangId == json || resourceLangId == jsonc"
         }
       ]
-    }
+    },
+    "submenus": [
+      {
+        "id": "code-jsonx.commands",
+        "label": "CodeJsonX"
+      }
+    ]
   },
   "scripts": {
     "vscode:prepublish": "pnpm run compile",
