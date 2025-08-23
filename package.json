@@ -1,8 +1,14 @@
 {
   "name": "code-jsonx",
-  "displayName": "code-jsonx",
+  "displayName": "CodeJsonX",
   "description": "A VS Code extension for formatting, compacting, escaping and unescaping JSON text",
   "version": "0.0.1",
+  "publisher": "guimingyue",
+  "icon": "icon.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/guimingyue/code-jsonx.git"
+  },
   "engines": {
     "vscode": "^1.102.0"
   },
@@ -80,7 +86,8 @@
     "watch": "tsc -watch -p ./",
     "pretest": "pnpm run compile && pnpm run lint",
     "lint": "eslint src",
-    "test": "npx @vscode/test-cli"
+    "test": "npx @vscode/test-cli",
+    "package": "vsce package"
   },
   "devDependencies": {
     "@types/mocha": "^10.0.10",
@@ -90,10 +97,9 @@
     "@typescript-eslint/parser": "^8.31.1",
     "@vscode/test-cli": "^0.0.11",
     "@vscode/test-electron": "^2.5.2",
+    "@vscode/vsce": "^3.2.1",
+    "canvas": "^3.2.0",
     "eslint": "^9.25.1",
     "typescript": "^5.8.3"
-  },
-  "dependencies": {
-    "code-jsonx": "link:"
   }
 }
