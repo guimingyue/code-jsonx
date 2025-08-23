@@ -3,6 +3,8 @@
 import * as vscode from 'vscode';
 import { registerFormatJsonCommand } from './commands/formatJsonCommand';
 import { registerCompactJsonCommand } from './commands/compactJsonCommand';
+import { registerEscapeJsonCommand } from './commands/escapeJsonCommand';
+import { registerUnescapeJsonCommand } from './commands/unescapeJsonCommand';
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
@@ -17,6 +19,12 @@ export function activate(context: vscode.ExtensionContext) {
 
 	// Register the compact JSON command
 	registerCompactJsonCommand(context);
+
+	// Register the escape JSON command
+	registerEscapeJsonCommand(context);
+
+	// Register the unescape JSON command
+	registerUnescapeJsonCommand(context);
 }
 
 // This method is called when your extension is deactivated

@@ -1,7 +1,7 @@
 {
   "name": "code-jsonx",
   "displayName": "code-jsonx",
-  "description": "A VS Code extension for formatting and compacting JSON files",
+  "description": "A VS Code extension for formatting, compacting, escaping and unescaping JSON text",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.102.0"
@@ -20,6 +20,14 @@
       {
         "command": "code-jsonx.compactJson",
         "title": "Compact JSON"
+      },
+      {
+        "command": "code-jsonx.escapeJson",
+        "title": "Escape JSON Text"
+      },
+      {
+        "command": "code-jsonx.unescapeJson",
+        "title": "Unescape JSON Text"
       }
     ],
     "menus": {
@@ -33,6 +41,16 @@
           "command": "code-jsonx.compactJson",
           "when": "resourceLangId == json || resourceLangId == jsonc",
           "group": "jsonx@2"
+        },
+        {
+          "command": "code-jsonx.escapeJson",
+          "when": "resourceLangId == json || resourceLangId == jsonc",
+          "group": "jsonx@3"
+        },
+        {
+          "command": "code-jsonx.unescapeJson",
+          "when": "resourceLangId == json || resourceLangId == jsonc",
+          "group": "jsonx@4"
         }
       ],
       "editor/title": [
@@ -45,6 +63,16 @@
           "command": "code-jsonx.compactJson",
           "when": "resourceLangId == json || resourceLangId == jsonc",
           "group": "jsonx@2"
+        },
+        {
+          "command": "code-jsonx.escapeJson",
+          "when": "resourceLangId == json || resourceLangId == jsonc",
+          "group": "jsonx@3"
+        },
+        {
+          "command": "code-jsonx.unescapeJson",
+          "when": "resourceLangId == json || resourceLangId == jsonc",
+          "group": "jsonx@4"
         }
       ]
     }
