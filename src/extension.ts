@@ -5,6 +5,8 @@ import { registerFormatJsonCommand } from './commands/formatJsonCommand';
 import { registerCompactJsonCommand } from './commands/compactJsonCommand';
 import { registerEscapeJsonCommand } from './commands/escapeJsonCommand';
 import { registerUnescapeJsonCommand } from './commands/unescapeJsonCommand';
+import { registerUrlEncodeCommand } from './commands/urlEncodeCommand';
+import { registerUrlDecodeCommand } from './commands/urlDecodeCommand';
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
@@ -25,6 +27,12 @@ export function activate(context: vscode.ExtensionContext) {
 
 	// Register the unescape JSON command
 	registerUnescapeJsonCommand(context);
+
+	// Register the URL encode command
+	registerUrlEncodeCommand(context);
+
+	// Register the URL decode command
+	registerUrlDecodeCommand(context);
 }
 
 // This method is called when your extension is deactivated

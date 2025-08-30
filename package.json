@@ -1,7 +1,7 @@
 {
   "name": "code-jsonx",
   "displayName": "CodeJsonX",
-  "description": "A VS Code extension for formatting, compacting, escaping and unescaping JSON text",
+  "description": "A VS Code extension for formatting, compacting, escaping, unescaping JSON text, and URL encoding/decoding",
   "version": "0.0.2",
   "publisher": "guimingyue",
   "icon": "icon.png",
@@ -34,6 +34,14 @@
       {
         "command": "code-jsonx.unescapeJson",
         "title": "Unescape JSON Text"
+      },
+      {
+        "command": "code-jsonx.urlEncode",
+        "title": "Encode"
+      },
+      {
+        "command": "code-jsonx.urlDecode",
+        "title": "Decode"
       }
     ],
     "menus": {
@@ -64,6 +72,16 @@
           "command": "code-jsonx.unescapeJson",
           "when": "resourceLangId == json || resourceLangId == jsonc",
           "group": "code-jsonx@4"
+        },
+        {
+          "command": "code-jsonx.urlEncode",
+          "when": "resourceLangId == json || resourceLangId == jsonc",
+          "group": "code-jsonx@5"
+        },
+        {
+          "command": "code-jsonx.urlDecode",
+          "when": "resourceLangId == json || resourceLangId == jsonc",
+          "group": "code-jsonx@6"
         }
       ],
       "editor/title": [
